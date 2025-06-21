@@ -161,7 +161,7 @@
       tablaBody.appendChild(row);
     }
 
-    document.getElementById("totalCosto").textContent = totalCostoInventario.toFixed(2);
+    document.getElementById("totalCosto").textContent = totalCostoInventario.toLocaleString('es-MX', { minimumFractionDigits: 2 });
   }
 
   cargarDatos();
