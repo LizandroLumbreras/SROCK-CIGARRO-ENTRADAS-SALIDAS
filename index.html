@@ -59,13 +59,13 @@
     <tbody></tbody>
   </table>
 
-  <div id="totalContainer">
-    <strong>Total de inventario (costo): $<span id="totalCosto">0.00</span></strong>
-  </div>
+<div id="totalContainer">
+  <strong>Total de inventario (costo): $<span id="totalCosto">0.00</span></strong>
+</div>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+  import { getFirestore, collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
   const firebaseConfig = {
     apiKey: "AIzaSyCK5nb6u2CGRJ8AB1aPlRn54b97bdeAFeM",
@@ -78,13 +78,15 @@
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
-  const tablaBody = document.querySelector("#tablaInventario tbody");
 
   const entradasRef = collection(db, "almacenes", "almacen_cigarro", "entradas");
   const salidasRef = collection(db, "almacenes", "almacen_cigarro", "salidas");
+  const productosRef = collection(db, "productos");
+  const tablaBody = document.querySelector("#tablaInventario tbody");
 
   const mapEntradas = new Map();
   const mapSalidas = new Map();
+  const mapProductos = new Map();
 
   function formatearFecha(fechaStr) {
     const fecha = new Date(fechaStr);
@@ -94,38 +96,37 @@
   async function cargarDatos() {
     let totalCostoInventario = 0;
 
-    const [entradasSnap, salidasSnap] = await Promise.all([
+    const [entradasSnap, salidasSnap, productosSnap] = await Promise.all([
       getDocs(entradasRef),
-      getDocs(salidasRef)
+      getDocs(salidasRef),
+      getDocs(productosRef)
     ]);
+  
+    // Mapa de productos con costo
+    productosSnap.forEach(doc => {
+      const data = doc.data();
+      mapProductos.set(doc.id, {
+        descripcion: data.Concepto || "-",
+        costo: data["Costo sin Impuesto"] || 0
+      });
+    });
 
     entradasSnap.forEach(doc => {
       const data = doc.data();
       const key = data.codigo;
       if (!mapEntradas.has(key)) {
-        mapEntradas.set(key, {
-          descripcion: data.concepto || "-",
-          cantidad: 0,
-          ultimaFecha: data.fecha,
-          costo_unitario: data.costo_unitario || 0
-        });
+        mapEntradas.set(key, { cantidad: 0, ultimaFecha: data.fecha });
       }
       const obj = mapEntradas.get(key);
       obj.cantidad += data.cantidad || 0;
       if (data.fecha > obj.ultimaFecha) obj.ultimaFecha = data.fecha;
-      if (data.costo_unitario) obj.costo_unitario = data.costo_unitario;
     });
 
     salidasSnap.forEach(doc => {
       const data = doc.data();
       const key = data.codigo;
       if (!mapSalidas.has(key)) {
-        mapSalidas.set(key, {
-          descripcion: data.descripcion || "-",
-          cantidad: 0,
-          sucursal: data.sucursal || "-",
-          ultimaFecha: data.fecha
-        });
+        mapSalidas.set(key, { cantidad: 0, sucursal: data.sucursal || "-", ultimaFecha: data.fecha });
       }
       const obj = mapSalidas.get(key);
       obj.cantidad += data.cantidad || 0;
@@ -133,13 +134,14 @@
     });
 
     const codigos = [...new Set([...mapEntradas.keys(), ...mapSalidas.keys()])].sort();
-    codigos.forEach(codigo => {
-      const entrada = mapEntradas.get(codigo) || { descripcion: "-", cantidad: 0, ultimaFecha: "0000-00-00", costo_unitario: 0 };
-      const salida = mapSalidas.get(codigo) || { descripcion: entrada.descripcion, cantidad: 0, sucursal: "-", ultimaFecha: "0000-00-00" };
+
+    for (const codigo of codigos) {
+      const entrada = mapEntradas.get(codigo) || { cantidad: 0, ultimaFecha: "0000-00-00" };
+      const salida = mapSalidas.get(codigo) || { cantidad: 0, sucursal: "-", ultimaFecha: "0000-00-00" };
+      const producto = mapProductos.get(codigo) || { descripcion: "-", costo: 0 };
 
       const stock = entrada.cantidad - salida.cantidad;
-      const costoUnitario = entrada.costo_unitario || 0;
-      const subtotal = stock * costoUnitario;
+      const subtotal = stock * producto.costo;
       const ultimaFecha = entrada.ultimaFecha > salida.ultimaFecha ? entrada.ultimaFecha : salida.ultimaFecha;
 
       totalCostoInventario += subtotal;
@@ -147,17 +149,17 @@
       const row = document.createElement("tr");
       row.innerHTML = `
         <td>${codigo}</td>
-        <td>${entrada.descripcion || salida.descripcion}</td>
+        <td>${producto.descripcion}</td>
         <td>${entrada.cantidad}</td>
         <td>${salida.cantidad}</td>
         <td class="${stock >= 0 ? 'positivo' : 'negativo'}">${stock}</td>
-        <td>$${costoUnitario.toFixed(2)}</td>
+        <td>$${producto.costo.toFixed(2)}</td>
         <td>$${subtotal.toFixed(2)}</td>
         <td>${salida.sucursal}</td>
         <td>${ultimaFecha !== "0000-00-00" ? formatearFecha(ultimaFecha) : "-"}</td>
       `;
       tablaBody.appendChild(row);
-    });
+    }
 
     document.getElementById("totalCosto").textContent = totalCostoInventario.toFixed(2);
   }
