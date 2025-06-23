@@ -44,6 +44,14 @@
       font-size: 16px;
       cursor: pointer;
     }
+    /* Ocultar columnas específicas visualmente (sin eliminarlas) */
+th:nth-child(3), td:nth-child(3), /* Entradas */
+th:nth-child(4), td:nth-child(4), /* Salidas */
+th:nth-child(8), td:nth-child(8), /* Sucursal destino */
+th:nth-child(9), td:nth-child(9)  /* Última fecha */
+{
+  display: none;
+}
   </style>
   <!-- Librería para exportar a Excel -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
