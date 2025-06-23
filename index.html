@@ -5,6 +5,11 @@
   <title>Reporte de Inventario</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
+    body {
+  font-family: Arial, sans-serif;
+  background: #f4f6f9;
+  padding: 20px;
+}
     h2 {
       text-align: center;
     }
@@ -53,35 +58,6 @@ th:nth-child(9), td:nth-child(9)  /* Última fecha */
 
 tbody tr:nth-child(odd) {
   background-color: #ffffff; /* Blanco */
-}
- /* Fondo general con imagen */
-body {
-  font-family: Arial, sans-serif;
-  background-image: url('fondo.jpg'); /* Asegúrate de tener el archivo fondo.jpg en la misma carpeta */
-  background-size: cover;
-  background-attachment: fixed;
-  background-position: center;
-  padding: 20px;
-  position: relative;
-  z-index: 1;
-}
-
-/* Marca de agua centrada (logo) */
-body::before {
-  content: "";
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 70%;
-  max-width: 800px;
-  transform: translate(-50%, -50%);
-  background-image: url('logo_proveedora.png'); /* Asegúrate de tener logo_proveedora.png */
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-  opacity: 0.15; /* Puedes subirlo si quieres más visibilidad */
-  z-index: 0;
-  pointer-events: none;
 }
   </style>
   <!-- Librería para exportar a Excel -->
