@@ -59,7 +59,20 @@ th:nth-child(9), td:nth-child(9)  /* Última fecha */
 tbody tr:nth-child(odd) {
   background-color: #ffffff; /* Blanco */
 }
-    body::before {
+ /* Fondo general con imagen */
+body {
+  font-family: Arial, sans-serif;
+  background-image: url('fondo.jpg'); /* Asegúrate de tener el archivo fondo.jpg en la misma carpeta */
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Marca de agua centrada (logo) */
+body::before {
   content: "";
   position: fixed;
   top: 50%;
@@ -67,18 +80,13 @@ tbody tr:nth-child(odd) {
   width: 70%;
   max-width: 800px;
   transform: translate(-50%, -50%);
-  background-image: url('logo_proveedora.png');
+  background-image: url('logo_proveedora.png'); /* Asegúrate de tener logo_proveedora.png */
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
-  opacity: 0.15; /* Ajusta visibilidad */
+  opacity: 0.15; /* Puedes subirlo si quieres más visibilidad */
   z-index: 0;
   pointer-events: none;
-}
-
-body {
-  position: relative;
-  z-index: 1;
 }
   </style>
   <!-- Librería para exportar a Excel -->
