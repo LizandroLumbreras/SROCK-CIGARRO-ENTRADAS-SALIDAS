@@ -175,14 +175,34 @@
 
     cargarDatos();
 
-    // Exportar a Excel
-    window.exportarExcel = function () {
-      const tabla = document.getElementById("tablaInventario");
-      const wb = XLSX.utils.book_new();
-      const ws = XLSX.utils.table_to_sheet(tabla);
-      XLSX.utils.book_append_sheet(wb, ws, "Inventario");
-      XLSX.writeFile(wb, "Inventario_Cigarros.xlsx");
-    };
-  </script>
+  // Exportar a Excel
+window.exportarExcel = function () {
+  const tabla = document.getElementById("tablaInventario");
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.table_to_sheet(tabla);
+  XLSX.utils.book_append_sheet(wb, ws, "Inventario");
+  XLSX.writeFile(wb, "Inventario_Cigarros.xlsx");
+};
+</script>
+
+<!-- Script para ocultar filas con stock en 0 (más seguro aún si se agregan dinámicamente) -->
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const observer = new MutationObserver(() => {
+      const rows = document.querySelectorAll("#tablaInventario tbody tr");
+      rows.forEach(row => {
+        const stockCell = row.children[4]; // Columna de Stock
+        if (stockCell && stockCell.textContent.trim() === "0") {
+          row.style.display = "none"; // Oculta la fila
+        }
+      });
+    });
+
+    const target = document.querySelector("#tablaInventario tbody");
+    if (target) {
+      observer.observe(target, { childList: true });
+    }
+  });
+</script>
 </body>
 </html>
