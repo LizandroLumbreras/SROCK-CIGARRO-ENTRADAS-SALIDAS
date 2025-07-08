@@ -4,72 +4,115 @@
   <meta charset="UTF-8">
   <title>Reporte de Inventario</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Fondo elegante y marca de agua -->
   <style>
-    table {
-  background-color: rgba(255, 255, 255, 0.85); /* blanco con 85% opacidad */
-  border-collapse: collapse;
-  width: 100%;
-  margin-top: 20px;
-}
     body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f9;
-  padding: 20px;
-}
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #00416A, #E4E5E6);
+      padding: 20px;
+      margin: 0;
+      color: white;
+      min-height: 100vh;
+      position: relative;
+      box-sizing: border-box;
+    }
+
+    .marca-agua {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      opacity: 0.08;
+      z-index: 0;
+      max-width: 80%;
+      height: auto;
+      pointer-events: none;
+    }
+
     h2 {
       text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      position: relative;
+      z-index: 2;
     }
+
     table {
-      width: 100%;
+      background-color: rgba(255, 255, 255, 0.85);
       border-collapse: collapse;
+      width: 100%;
       margin-top: 20px;
+      color: #333;
+      position: relative;
+      z-index: 2;
     }
+
     th, td {
       border: 1px solid #ccc;
       padding: 8px;
       text-align: left;
     }
+
     th {
       background: #007bff;
       color: white;
     }
+
+    tbody tr:nth-child(even) {
+      background-color: rgba(240, 240, 240, 0.7);
+    }
+
+    tbody tr:nth-child(odd) {
+      background-color: rgba(255, 255, 255, 0.7);
+    }
+
     .positivo {
       color: green;
     }
+
     .negativo {
       color: red;
     }
+
     #totalContainer {
       text-align: right;
       font-size: 18px;
       margin-top: 30px;
+      position: relative;
+      z-index: 2;
+      color: white;
     }
+
     button {
       margin-top: 20px;
       padding: 10px 20px;
       font-size: 16px;
       cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #d32f2f;
+      color: white;
+      position: relative;
+      z-index: 2;
     }
-    /* Ocultar columnas específicas visualmente (sin eliminarlas) */
-th:nth-child(3), td:nth-child(3), /* Entradas */
-th:nth-child(4), td:nth-child(4), /* Salidas */
-th:nth-child(8), td:nth-child(8), /* Sucursal destino */
-th:nth-child(9), td:nth-child(9)  /* Última fecha */
-{
-  display: none;
-}
-    tbody tr:nth-child(even) {
-  background-color: #f0f0f0; /* Gris claro */
-}
 
-tbody tr:nth-child(odd) {
-  background-color: #ffffff; /* Blanco */
-}
+    button:hover {
+      background-color: #b71c1c;
+    }
+
+    /* Ocultar columnas específicas */
+    th:nth-child(3), td:nth-child(3),
+    th:nth-child(4), td:nth-child(4),
+    th:nth-child(8), td:nth-child(8),
+    th:nth-child(9), td:nth-child(9) {
+      display: none;
+    }
   </style>
-  <!-- Librería para exportar a Excel -->
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 </head>
 <body>
+  <img src="logo_proveedora.png" alt="Marca de agua" class="marca-agua">
+
   <h2>Reporte de Inventario - Cigarro</h2>
   <table id="tablaInventario">
     <thead>
@@ -196,34 +239,32 @@ tbody tr:nth-child(odd) {
 
     cargarDatos();
 
-  // Exportar a Excel
-window.exportarExcel = function () {
-  const tabla = document.getElementById("tablaInventario");
-  const wb = XLSX.utils.book_new();
-  const ws = XLSX.utils.table_to_sheet(tabla);
-  XLSX.utils.book_append_sheet(wb, ws, "Inventario");
-  XLSX.writeFile(wb, "Inventario_Cigarros.xlsx");
-};
-</script>
+    window.exportarExcel = function () {
+      const tabla = document.getElementById("tablaInventario");
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.table_to_sheet(tabla);
+      XLSX.utils.book_append_sheet(wb, ws, "Inventario");
+      XLSX.writeFile(wb, "Inventario_Cigarros.xlsx");
+    };
+  </script>
 
-<!-- Script para ocultar filas con stock en 0 (más seguro aún si se agregan dinámicamente) -->
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const observer = new MutationObserver(() => {
-      const rows = document.querySelectorAll("#tablaInventario tbody tr");
-      rows.forEach(row => {
-        const stockCell = row.children[4]; // Columna de Stock
-        if (stockCell && stockCell.textContent.trim() === "0") {
-          row.style.display = "none"; // Oculta la fila
-        }
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const observer = new MutationObserver(() => {
+        const rows = document.querySelectorAll("#tablaInventario tbody tr");
+        rows.forEach(row => {
+          const stockCell = row.children[4];
+          if (stockCell && stockCell.textContent.trim() === "0") {
+            row.style.display = "none";
+          }
+        });
       });
-    });
 
-    const target = document.querySelector("#tablaInventario tbody");
-    if (target) {
-      observer.observe(target, { childList: true });
-    }
-  });
-</script>
+      const target = document.querySelector("#tablaInventario tbody");
+      if (target) {
+        observer.observe(target, { childList: true });
+      }
+    });
+  </script>
 </body>
 </html>
