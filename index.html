@@ -80,7 +80,7 @@
       margin-top: 30px;
       position: relative;
       z-index: 2;
-      color: white;
+      color: blue;
     }
 
     button {
@@ -116,6 +116,9 @@
   <h2>Reporte de Inventario - Cigarro</h2>
   <table id="tablaInventario">
     <thead>
+       <div id="totalContainer">
+    <strong>Total de inventario (costo): $<span id="totalCosto">0.00</span></strong>
+  </div>
       <tr>
         <th>Código</th>
         <th>Descripción</th>
@@ -130,10 +133,6 @@
     </thead>
     <tbody></tbody>
   </table>
-
-  <div id="totalContainer">
-    <strong>Total de inventario (costo): $<span id="totalCosto">0.00</span></strong>
-  </div>
 
   <button onclick="exportarExcel()">Descargar Excel</button>
 
